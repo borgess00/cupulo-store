@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 const ERROS: Record<string, string> = {
   banido: "Sua conta está bloqueada. Fale com a staff no Discord.",
+  sessao: "Sua sessão expirou. Entre de novo.",
   AccessDenied: "O login foi cancelado ou negado. Tente de novo.",
   OAuthCallbackError: "O Discord não confirmou o login. Tente de novo.",
   OAuthSignin: "Não foi possível iniciar o login com o Discord.",

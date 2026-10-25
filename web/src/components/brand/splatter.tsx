@@ -31,14 +31,16 @@ export function Splatter({ seed = "cupulo", className }: { seed?: string; classN
       w: 1.5 + rand() * 3,
     };
   });
+  // Gotas como arcos de um único <path> (menos elementos no HTML).
+  const f = (n: number) => n.toFixed(1);
+  const dots = drops
+    .map(({ cx, cy, r }) => `M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 -${f(2 * r)} 0z`)
+    .join("");
   return (
     <svg viewBox="0 0 200 200" className={cn("pointer-events-none", className)} aria-hidden="true">
-      <polygon points={blob.join(" ")} fill="currentColor" />
+      <path d={`M${blob.join("L")}z${dots}`} fill="currentColor" />
       {streaks.map((s, i) => (
-        <line key={i} {...s} stroke="currentColor" strokeWidth={s.w} strokeLinecap="round" />
-      ))}
-      {drops.map((d, i) => (
-        <circle key={i} cx={d.cx.toFixed(1)} cy={d.cy.toFixed(1)} r={d.r.toFixed(1)} fill="currentColor" />
+        <path key={i} d={`M${f(s.x1)} ${f(s.y1)}L${f(s.x2)} ${f(s.y2)}`} stroke="currentColor" strokeWidth={s.w.toFixed(1)} strokeLinecap="round" />
       ))}
     </svg>
   );

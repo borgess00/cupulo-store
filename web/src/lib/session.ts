@@ -30,8 +30,12 @@ export async function getCurrentUser() {
 export type CurrentUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
 
 export async function requireUser(callbackPath = "/biblioteca"): Promise<CurrentUser> {
-  const user = await getCurrentUser();
-  if (!user) redirect(`/login?callbackUrl=${encodeURIComponent(callbackPath)}`);
+  const session = await getSession();
+  const id = session?.user?.id;
+  if (!id) redirect(`/login?callbackUrl=${encodeURIComponent(callbackPath)}`);
+  const user = await db.user.findUnique({ where: { id } });
+  // Cookie válido, mas conta bloqueada/apagada: encerra a sessão (evita loop com /login).
+  if (!user || user.banned) redirect("/api/sessao/encerrar");
   return user;
 }
 

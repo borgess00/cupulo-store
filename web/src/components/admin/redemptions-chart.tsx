@@ -18,13 +18,13 @@ export function RedemptionsChart({ data }: { data: Point[] }) {
             <XAxis
               dataKey="day"
               tickFormatter={fmtDay}
-              tick={{ fill: "#8a8a8a", fontSize: 11 }}
+              tick={{ fill: "#9a9a9a", fontSize: 11 }}
               axisLine={{ stroke: "rgb(255 255 255 / 0.16)" }}
               tickLine={false}
               interval="preserveStartEnd"
               minTickGap={18}
             />
-            <YAxis allowDecimals={false} tick={{ fill: "#8a8a8a", fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+            <YAxis allowDecimals={false} tick={{ fill: "#9a9a9a", fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
             <Tooltip
               cursor={{ fill: "rgb(255 255 255 / 0.06)" }}
               contentStyle={{ background: "#121212", border: "1px solid rgb(255 255 255 / 0.25)", borderRadius: 6 }}
