@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 const schema = z.object({
   DATABASE_URL: z.string().min(1),

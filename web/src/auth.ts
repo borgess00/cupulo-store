@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import type { DiscordProfile } from "next-auth/providers/discord";
 import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { authConfig } from "@/auth.config";
 import { db } from "@/lib/db";
 import { devLoginEnabled } from "@/lib/env";
