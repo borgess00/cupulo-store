@@ -48,7 +48,7 @@ async function Library() {
           return (
             <li key={a.id} className={`card-grunge glitch-hover flex overflow-hidden ${expired ? "opacity-70" : ""}`}>
               <Link href={`/produto/${a.product.slug}`} className="hidden w-40 shrink-0 border-r border-line sm:block" tabIndex={-1} aria-hidden="true">
-                <ProductCover product={a.product} className="h-full !aspect-auto" />
+                <ProductCover product={a.product} compact className="h-full !aspect-auto" />
               </Link>
               <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
                 <div className="flex items-start justify-between gap-3">

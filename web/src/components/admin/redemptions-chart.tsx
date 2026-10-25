@@ -33,7 +33,7 @@ export function RedemptionsChart({ data }: { data: Point[] }) {
               labelFormatter={(d) => fmtDay(String(d))}
               formatter={(v) => [v, "Resgates"]}
             />
-            <Bar dataKey="redemptions" fill="#f2f2f0" radius={[4, 4, 0, 0]} maxBarSize={18} />
+            <Bar dataKey="redemptions" fill="#f2f2f0" radius={[4, 4, 0, 0]} maxBarSize={18} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
       </div>
