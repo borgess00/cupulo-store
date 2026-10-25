@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ArrowLeft, Calculator, FileDown, History, KeyRound, Lock, PlayCircle, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { AccessBadge } from "@/components/access-badge";
+import { Badge } from "@/components/ui/badge";
 import { ProductCover } from "@/components/brand/product-cover";
 import { DownloadButton } from "@/components/download-button";
 import { buttonClasses, ButtonLink } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { YouTubeEmbed } from "@/components/ui/youtube";
 import { accessStatus } from "@/lib/access-math";
 import { db } from "@/lib/db";
+import { isAdminDiscordId } from "@/lib/env";
 import { formatBytes, formatDate, formatDateTime, PLATFORM_LABEL } from "@/lib/format";
 import { getProductPage } from "@/lib/products";
 import { requireUser } from "@/lib/session";
@@ -39,7 +41,8 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
     where: { userId_productId: { userId: user.id, productId: product.id } },
   });
   const status = access ? accessStatus(access) : "expired";
-  const unlocked = status !== "expired";
+  const isAdmin = isAdminDiscordId(user.discordId);
+  const unlocked = status !== "expired" || isAdmin;
   // Produto desativado só aparece para quem já tem acesso.
   if (!product.active && !unlocked) notFound();
 
@@ -66,6 +69,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
                 </p>
               )}
               {status === "lifetime" && <p className="text-sm text-ash">Acesso vitalício.</p>}
+              {isAdmin && status === "expired" && <Badge tone="muted">Pré-visualização de admin</Badge>}
             </div>
           </div>
         </div>

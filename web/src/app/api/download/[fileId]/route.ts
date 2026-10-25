@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { hasActiveAccess } from "@/lib/access";
+import { canAccessProduct } from "@/lib/access";
 import { db } from "@/lib/db";
 import { clientIp, hashIp } from "@/lib/ip";
 import { isSameOrigin } from "@/lib/origin";
@@ -16,14 +16,14 @@ export async function POST(req: Request, ctx: RouteContext<"/api/download/[fileI
   const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ message: "Faça login para baixar." }, { status: 401 });
 
-  const user = await db.user.findUnique({ where: { id: userId }, select: { id: true, banned: true } });
+  const user = await db.user.findUnique({ where: { id: userId }, select: { id: true, discordId: true, banned: true } });
   if (!user || user.banned) return NextResponse.json({ message: "Conta sem permissão." }, { status: 403 });
 
   const { fileId } = await ctx.params;
   const file = await db.productFile.findUnique({ where: { id: fileId } });
   if (!file) return NextResponse.json({ message: "Arquivo não encontrado." }, { status: 404 });
 
-  if (!(await hasActiveAccess(user.id, file.productId))) {
+  if (!(await canAccessProduct(user, file.productId))) {
     return NextResponse.json({ message: "Seu acesso a este produto não está ativo." }, { status: 403 });
   }
 

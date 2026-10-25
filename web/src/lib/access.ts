@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { isAdminDiscordId } from "@/lib/env";
 import { accessStatus, extendExpiry, isAccessActive, shrinkExpiry } from "@/lib/access-math";
 
 type Tx = Prisma.TransactionClient;
@@ -133,6 +134,12 @@ export async function hasActiveAccess(userId: string, productId: string): Promis
     select: { expiresAt: true, lifetime: true },
   });
   return !!access && isAccessActive(access);
+}
+
+/** Pode abrir o produto? Admins sempre podem (pré-visualização). */
+export async function canAccessProduct(user: { id: string; discordId: string }, productId: string): Promise<boolean> {
+  if (isAdminDiscordId(user.discordId)) return true;
+  return hasActiveAccess(user.id, productId);
 }
 
 /** Todos os acessos do usuário (ativos e expirados), com o produto. */

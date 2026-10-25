@@ -5,7 +5,7 @@ import { SensiForm } from "@/components/sensi-form";
 import { buttonClasses, ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { hasActiveAccess } from "@/lib/access";
+import { canAccessProduct } from "@/lib/access";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { SENSI_PRODUCT_SLUG, site } from "@/lib/site";
@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Gerador de Sensi iOS", robots: { ind
 async function Gate() {
   const user = await requireUser("/gerador-sensi");
   const product = await db.product.findUnique({ where: { slug: SENSI_PRODUCT_SLUG }, select: { id: true } });
-  const liberado = !!product && (await hasActiveAccess(user.id, product.id));
+  const liberado = !!product && (await canAccessProduct(user, product.id));
 
   if (!liberado) {
     return (
