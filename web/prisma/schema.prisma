@@ -1,0 +1,198 @@
+// Schema do banco da CUPULO STORE.
+// Depois de alterar: `npm run db:migrate` (gera migration + client).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Platform {
+  ANDROID
+  IOS
+  EMULADOR
+  MOBILADOR
+  MULTI
+}
+
+enum ProductType {
+  PACK
+  TOOL // ferramenta dentro do site (Gerador de Sensi)
+}
+
+enum KeyDuration {
+  DAYS_7
+  DAYS_30
+  LIFETIME
+}
+
+enum KeyStatus {
+  AVAILABLE
+  REDEEMED
+  REVOKED
+}
+
+enum KeyOrigin {
+  BOT
+  ADMIN
+}
+
+model User {
+  id          String        @id @default(cuid())
+  discordId   String        @unique
+  username    String
+  globalName  String?
+  avatar      String? // hash do avatar no CDN do Discord
+  banned      Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  lastLoginAt DateTime      @default(now())
+  accesses    Access[]
+  redemptions Redemption[]
+  downloads   DownloadLog[]
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  slug        String           @unique
+  name        String
+  shortDesc   String
+  description String // markdown
+  imageUrl    String? // sem imagem → capa gerada no estilo da marca
+  category    String
+  platform    Platform
+  type        ProductType      @default(PACK)
+  tutorialMd  String?
+  youtubeUrl  String?
+  active      Boolean          @default(true)
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  files       ProductFile[]
+  changelog   ChangelogEntry[]
+  keys        Key[]
+  accesses    Access[]
+  redemptions Redemption[]
+  downloads   DownloadLog[]
+}
+
+model ProductFile {
+  id         String        @id @default(cuid())
+  productId  String
+  product    Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name       String
+  storageKey String        @unique
+  sizeBytes  BigInt
+  mimeType   String
+  version    String?
+  createdAt  DateTime      @default(now())
+  downloads  DownloadLog[]
+
+  @@index([productId])
+}
+
+model ChangelogEntry {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  version     String
+  notes       String // markdown
+  publishedAt DateTime @default(now())
+
+  @@index([productId, publishedAt])
+}
+
+model Key {
+  id           String      @id @default(cuid())
+  keyHash      String      @unique // HMAC-SHA256 da key normalizada
+  last4        String // só para exibição: CUPULO-••••-••••-AB7K
+  productId    String
+  product      Product     @relation(fields: [productId], references: [id])
+  duration     KeyDuration
+  status       KeyStatus   @default(AVAILABLE)
+  origin       KeyOrigin
+  createdBy    String // discordId de quem gerou
+  batchId      String? // lote gerado junto
+  note         String? // ex: "venda #123"
+  createdAt    DateTime    @default(now())
+  revokedAt    DateTime?
+  revokedBy    String?
+  revokeReason String?
+  redemption   Redemption?
+
+  @@index([productId, status])
+  @@index([batchId])
+  @@index([createdAt])
+}
+
+model Redemption {
+  id          String   @id @default(cuid())
+  keyId       String   @unique // a key só pode ser usada uma vez
+  key         Key      @relation(fields: [keyId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  daysGranted Int? // null = vitalícia
+  redeemedAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([productId])
+  @@index([redeemedAt])
+}
+
+// Estado atual do acesso de um usuário a um produto.
+// Ativo se `lifetime` ou `expiresAt` no futuro.
+// `expiresAt` acumula o tempo das keys temporárias mesmo quando há vitalícia,
+// assim revogar a vitalícia não apaga o tempo comprado com outras keys.
+model Access {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id])
+  expiresAt      DateTime?
+  lifetime       Boolean   @default(false) // manualLifetime OU alguma key vitalícia ativa
+  manualLifetime Boolean   @default(false) // vitalício concedido pelo admin
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+model DownloadLog {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  productId String
+  product   Product     @relation(fields: [productId], references: [id])
+  fileId    String
+  file      ProductFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model RateLimit {
+  bucket      String   @id // ex: "redeem:user:<id>"
+  count       Int
+  windowStart DateTime
+}
+
+// Ações de admin e do bot (geração, revogação, acesso manual…)
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String // discordId
+  action    String
+  target    String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* ───────────── Tokens da marca: streetwear grunge P&B ───────────── */
+@theme {
+  --color-ink: #0a0a0a;
+  --color-ink-2: #121212;
+  --color-ink-3: #1b1b1b;
+  --color-paper: #f2f2f0;
+  --color-ash: #a3a3a3;
+  --color-smoke: #6b6b6b;
+  --color-line: rgb(255 255 255 / 0.16);
+  --color-line-strong: rgb(255 255 255 / 0.4);
+  --color-ok: #e8e8e8;
+  --color-danger: #ff5c5c;
+
+  --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --font-brush: "Permanent Marker", "Comic Sans MS", cursive;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 0.6rem;
+
+  --animate-glitch: glitch 0.35s steps(2, end) 1;
+  --animate-flicker: flicker 2.8s linear infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); clip-path: inset(0 0 0 0); }
+  20% { transform: translate(-2px, 1px); clip-path: inset(12% 0 58% 0); }
+  40% { transform: translate(2px, -1px); clip-path: inset(62% 0 8% 0); }
+  60% { transform: translate(-1px, 0); clip-path: inset(30% 0 40% 0); }
+  80% { transform: translate(1px, 1px); clip-path: inset(80% 0 2% 0); }
+  100% { transform: translate(0); clip-path: inset(0 0 0 0); }
+}
+
+@keyframes flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.55; }
+  95% { opacity: 1; }
+  97% { opacity: 0.7; }
+}
+
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+
+/* ───────────── Base ───────────── */
+html {
+  background: var(--color-ink);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 3px;
+}
+
+/* Grão de filme por cima de tudo (não intercepta cliques). */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ───────────── Utilitários da marca ───────────── */
+@utility font-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+}
+
+@utility font-brush {
+  font-family: var(--font-brush);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Letras gastas: o texto é "corroído" por uma máscara de ruído. */
+@utility text-worn {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='3' seed='4'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4.2 3.25'/></filter><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='3' seed='4'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -4.2 3.25'/></filter><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
+  -webkit-mask-size: 300px;
+  mask-size: 300px;
+}
+
+/* Retícula de pontos (halftone). */
+@utility halftone {
+  background-image: radial-gradient(circle at center, rgb(255 255 255 / 0.9) 0 1.6px, transparent 2px);
+  background-size: 9px 9px;
+}
+
+@utility halftone-fade {
+  background-image: radial-gradient(circle at center, rgb(255 255 255 / 0.85) 0 1.6px, transparent 2px);
+  background-size: 9px 9px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+  mask-image: radial-gradient(ellipse at center, #000 10%, transparent 70%);
+}
+
+/* Linhas de varredura discretas. */
+@utility scanlines {
+  background-image: repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 3px);
+}
+
+/* Fita adesiva de colagem. */
+@utility tape {
+  background: rgb(230 230 225 / 0.82);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.4);
+  clip-path: polygon(2% 0, 98% 4%, 100% 96%, 0 100%, 3% 50%);
+}
+
+/* Borda rasgada (topo/fundo de seções). */
+@utility torn-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 96% 97%, 91% 93%, 85% 99%, 78% 94%, 71% 98%, 64% 93%, 57% 99%, 49% 94%, 42% 98%, 35% 93%, 28% 99%, 20% 94%, 13% 98%, 6% 93%, 0 98%);
+}
+
+/* Card padrão: borda fina branca + glitch no hover. */
+@utility card-grunge {
+  position: relative;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.01)),
+    var(--color-ink-2);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.glitch-hover {
+  position: relative;
+}
+.glitch-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.08) 0 2px, transparent 2px 5px);
+  mix-blend-mode: screen;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .glitch-hover:hover {
+    border-color: var(--color-line-strong);
+  }
+  .glitch-hover:hover::after {
+    opacity: 1;
+    animation: var(--animate-glitch);
+  }
+  .glitch-hover:hover .glitch-shift {
+    animation: var(--animate-glitch);
+    text-shadow: 2px 0 rgb(255 255 255 / 0.35), -2px 0 rgb(120 120 120 / 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ───────────── Conteúdo em markdown (tutoriais, changelog, termos) ───────────── */
+.prose-grunge {
+  color: rgb(242 242 240 / 0.86);
+  line-height: 1.7;
+  font-size: 0.98rem;
+}
+.prose-grunge > * + * { margin-top: 0.9em; }
+.prose-grunge h1,
+.prose-grunge h2,
+.prose-grunge h3 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  color: var(--color-paper);
+  line-height: 1;
+  margin-top: 1.6em;
+}
+.prose-grunge h1 { font-size: 2rem; }
+.prose-grunge h2 { font-size: 1.55rem; }
+.prose-grunge h3 { font-size: 1.2rem; }
+.prose-grunge a { text-decoration: underline; text-underline-offset: 3px; color: var(--color-paper); }
+.prose-grunge strong { color: var(--color-paper); }
+.prose-grunge ul { list-style: square; padding-left: 1.25rem; }
+.prose-grunge ol { list-style: decimal; padding-left: 1.25rem; }
+.prose-grunge li + li { margin-top: 0.35em; }
+.prose-grunge code {
+  font-size: 0.9em;
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  padding: 0.05em 0.35em;
+}
+.prose-grunge pre { overflow-x: auto; background: var(--color-ink-3); padding: 1rem; border-radius: 6px; }
+.prose-grunge pre code { background: none; border: 0; padding: 0; }
+.prose-grunge blockquote { border-left: 3px solid var(--color-paper); padding-left: 1rem; color: var(--color-ash); }
+.prose-grunge table { width: 100%; border-collapse: collapse; font-size: 0.9rem; display: block; overflow-x: auto; }
+.prose-grunge th,
+.prose-grunge td { border: 1px solid var(--color-line); padding: 0.45rem 0.6rem; text-align: left; }
+.prose-grunge hr { border-color: var(--color-line); }
+.prose-grunge img { border-radius: 6px; border: 1px solid var(--color-line); }
