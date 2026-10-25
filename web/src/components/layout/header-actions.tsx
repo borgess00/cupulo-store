@@ -161,5 +161,5 @@ function MemberMenu({ links }: { links: { href: string; label: string; icon: typ
 
 function Avatar({ src, size = 28 }: { src: string | null; size?: number }) {
   if (!src) return <span style={{ width: size, height: size }} className="inline-block rounded-full bg-white/10" />;
-  return <Image src={src} alt="" width={size} height={size} className="rounded-full ring-1 ring-white/20" />;
+  return <Image src={src} alt="" width={size} height={size} unoptimized className="rounded-full ring-1 ring-white/20" />;
 }

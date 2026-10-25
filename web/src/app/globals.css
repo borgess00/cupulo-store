@@ -21,6 +21,7 @@
 
   --animate-glitch: glitch 0.35s steps(2, end) 1;
   --animate-flicker: flicker 2.8s linear infinite;
+  --animate-marquee: marquee 28s linear infinite;
 }
 
 @keyframes glitch {
@@ -30,6 +31,11 @@
   60% { transform: translate(-1px, 0); clip-path: inset(30% 0 40% 0); }
   80% { transform: translate(1px, 1px); clip-path: inset(80% 0 2% 0); }
   100% { transform: translate(0); clip-path: inset(0 0 0 0); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @keyframes flicker {
